@@ -1,0 +1,62 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/editor.css')
+    link(rel='stylesheet', href='/stylesheets/preview.css')
+    script(type='text/javascript', src='/javascripts/jquery-1.11.1.js')
+    script(type='text/javascript', src='/javascripts/marked.js')
+    script(type='text/javascript', src='/javascripts/ace/ace.js')
+  body
+    table.tbl
+      tr
+        td
+          input(type="text")
+        td(style="width: 1%")
+          input(type="text",style="width:100px")
+        td(style="width: 1%")
+          | aaa
+        td(style="width: 1%")
+          | bbb
+    #work_area
+      #editor
+      #viewer
+
+    script(type="text/javascript").
+      marked.setOptions({
+        renderer: new marked.Renderer(),
+        gfm: true,
+        tables: true,
+        breaks: false,
+        pedantic: false,
+        sanitize: true,
+        smartLists: true,
+        smartypants: false
+      });
+
+      var editor = ace.edit($("#editor").get(0));
+      editor.setTheme("ace/theme/eclipse");
+      editor.setPrintMarginColumn(80);
+      editor.session.setMode("ace/mode/markdown");
+      var doc = editor.getSession().doc;
+      doc.on('change', function (e) {
+        var txt = editor.getValue();
+        var html = marked(txt);
+        $("#viewer").html(html);
+      });
+      editor.session.on('changeScrollTop', syncPreview);
+
+      function syncPreview() {
+        var v = $("#viewer");
+        var n = editor.getSession().getLength();
+        var i = editor.getFirstVisibleRow();
+        var r = getScrollHeight(v);
+        v.scrollTop(i * r / n);
+      }
+
+      function getScrollHeight(e) {
+        return e[0].scrollHeight !== undefined ? e[0].scrollHeight : e.find("html")[0].scrollHeight !== undefined && e.find("html")[0].scrollHeight !== 0 ? e.find("html")[0].scrollHeight : e.find("body")[0].scrollHeight
+      }
+
+
+
