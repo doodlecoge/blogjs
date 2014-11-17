@@ -31,3 +31,15 @@ dao.addTag = function (name, callback) {
     });
 };
 
+dao.delTag = function (name, callback) {
+    pool.getConnection(function (err, conn) {
+        if (err) console.log(err);
+        var sql = "delete from tags where name=?";
+        conn.query(sql, [name], function (err, rows) {
+            conn.release();
+            if (err) console.log('delete tag failed');
+            callback(err, rows);
+        });
+    });
+};
+

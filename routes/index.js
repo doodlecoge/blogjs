@@ -6,7 +6,7 @@ var db = require('../utils/db.js');
 router.get('/', function (req, res) {
     var page = 0;
     var size = 2;
-    db.getAllArticles(page, size, function (count, rows) {
+    db.getArticles(page, size, function (count, rows) {
         res.render('index', {
             title: 'Index',
             articles: rows,

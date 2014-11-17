@@ -1,14 +1,19 @@
 // Created by hch on 2014/11/6.
 
 extends layout
-block content
 
-  - for(var i = 0; i < tags.length; i++)
-    -var tag = tags[i]
-    p #{tag.name}
+
+
+block content
+  ul.tags
+    each tag in tags
+      li #{tag.name}
+        a.del(href="/tag/#{encodeURIComponent(tag.name)}/del") &times;
+
+
 
   form(action="/tag/new", method="post")
     input(type="text", name="tag")
-    input(type="submit")
+    input(type="submit", value="Add Tag")
 
 

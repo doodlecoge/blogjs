@@ -2,9 +2,9 @@
 
 extends layout
 block content
+  ul
+  -for(var i = 0; i < articles.length; i++)
+    -var a = articles[i];
+    li
+      a(href="/article/#{a.id}") #{a.title}
 
-  h1 #{title}
-  #tags
-    a 1111
-  hr
-  | !{content}

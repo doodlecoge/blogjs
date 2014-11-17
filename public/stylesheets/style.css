@@ -44,3 +44,36 @@ body {
   text-align: center;
   line-height: 50px;
 }
+/*=======================================================*/
+ul.tags {
+  padding: 0px;
+  margin: 0px;
+}
+ul.tags li {
+  list-style: none;
+  display: -moz-inline-stack;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  line-height: 30px;
+  position: relative;
+  background: #ccc;
+  margin: 0 10px 10px 15px;
+  padding: 0 10px;
+}
+ul.tags li:before {
+  content: " ";
+  border: 15px solid transparent;
+  border-right: 15px solid #ccc;
+  border-left: 0px;
+  position: absolute;
+  left: -15px;
+}
+ul.tags li a {
+  margin-left: 10px;
+  text-decoration: none;
+  font-weight: bold;
+}
+ul.tags li a:hover {
+  color: #f00;
+}

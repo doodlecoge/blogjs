@@ -41,7 +41,7 @@ var db = {
             });
         });
     },
-    getAllArticles: function (page, size, callback) {
+    getArticles: function (page, size, callback) {
         var start = Math.max(0, page - 1 * size);
 
         this.pool.getConnection(function (err, conn) {

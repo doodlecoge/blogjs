@@ -22,6 +22,46 @@ function mk(markedText) {
     return marked(markedText);
 }
 
+router.get('/', function (req, res) {
+    dao.getArticles(0, 10, function (err, rows, count) {
+        console.log(rows);
+        console.log('.............');
+        if (err) {
+            res.render('error');
+        } else {
+            res.render('article', {
+                articles: rows,
+                page: 1,
+                size: 10,
+                count: count
+            });
+        }
+    });
+});
+
+router.get('/p/:idx', function (req, res) {
+    var page = req.param('idx');
+
+    try {
+        page = parseInt(page);
+    } catch (e) {
+        page = 1;
+    }
+
+    dao.getArticles(page, 10, function (err, rows, count) {
+        if (err) {
+            res.render('error');
+        } else {
+            res.render('article', {
+                articles: rows,
+                page: page,
+                size: 10,
+                count: count
+            });
+        }
+    });
+});
+
 router.get('/new', function (req, res) {
     res.render('article_new');
 });
@@ -33,14 +73,13 @@ router.get('/:id', function (req, res) {
         if (err || rows == null || rows.length != 1) {
             res.render('error');
         } else {
-            res.render('article', {
+            res.render('article_show', {
                 title: rows[0].title,
                 content: mk(rows[0].content)
             });
         }
     });
 });
-
 
 
 /* add new article */

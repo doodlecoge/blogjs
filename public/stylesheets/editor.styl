@@ -19,9 +19,20 @@ border_box()
   -moz-box-sizing border-box
   -webkit-box-sizing border-box
 
+inline_block()
+  display -moz-inline-stack
+  display inline-block
+  zoom 1
+  *display inline
+
 body
   margin 0px
   background #eee
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif
+
+#W
+  font-size 16px
+  position absolute
 
 .tbl
   width 100%
@@ -37,7 +48,7 @@ body
   border 0px
 
 
-.tbl input
+.tbl input, .tbl #tags
   height 30px
   background #fff
   border border_style
@@ -45,16 +56,29 @@ body
   outline none
   width 100%
   border-radius 5px
-  font-size 16px
   border_box()
+  font-size 16px
+  cursor text
+
+
+
+.tbl #tags .ipt
+  height 28px
+  padding 0px
+  border 0px
+  width 12px
+
+
+
 
 
 #work_area
   position: absolute
-  top 41px
+  top 76px
   bottom 0px
   left 0px
   right 0px
+
 
 #work_area #editor
   position absolute
