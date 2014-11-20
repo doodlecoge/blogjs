@@ -50,6 +50,10 @@
             this.input = $('<input>').appendTo(this.element);
             this.element.click(function (e) {
                 if (e.target == this) _this.input.focus();
+                var el = $(e.target);
+                if (el.hasClass('del')) {
+                    el.parent().remove();
+                }
             });
             this.ruler = $('<span class="W">').appendTo(this.element);
             if (this.options.autocomplete) {
@@ -71,29 +75,41 @@
                 },
                 keydown: function (e) {
                     if (e.keyCode == 13) {
-                        if (this.dropdown)
-                            this._closeDropdown();
                         var sel = this.dropdown.find('.sel');
-                        if (sel.length != 0) {
+                        if (sel.length == 0) {
+                            var val = this.input.val();
+                            if (!this.options.autocomplete)
+                                this._addItem(val);
+                        } else {
                             this.input.val(sel.html());
                             this._updateInputWidth();
-                            if (this.options.onSelected)
-                                this.options.onSelected.call(
-                                    this, sel.data('val'));
+                            if (this.options.autocomplete.onSelected) {
+                                var v = sel.data('val');
+                                this.options.autocomplete.onSelected
+                                    .call(this, v);
+                                this._addItem(v);
+                            }
                         }
+                        if (this.dropdown) this._closeDropdown();
                     } else if (e.keyCode == 38) {
+                        if (!this.isDropdownShown) return;
                         var sel = this.dropdown.find('.sel').prev();
                         if (sel.length == 0)
                             sel = this.dropdown.children(':last');
                         this.dropdown.children().removeClass('sel');
                         sel.addClass('sel');
+                        this.input.val(sel.html());
+                        this._updateInputWidth();
                         e.preventDefault();
                     } else if (e.keyCode == 40) {
+                        if (!this.isDropdownShown) return;
                         var sel = this.dropdown.find('.sel').next();
                         if (sel.length == 0)
                             sel = this.dropdown.children(':first');
                         this.dropdown.children().removeClass('sel');
                         sel.addClass('sel');
+                        this.input.val(sel.html());
+                        this._updateInputWidth();
                         e.preventDefault();
                     }
                 }
@@ -105,7 +121,7 @@
             this.input.width(this.ruler.width() + 16);
         },
         _updateDropdown: function (val) {
-            var data = this.options.autocomplete;
+            var data = this.options.autocomplete.data;
             if (!data) return;
 
             if (val) {
@@ -138,8 +154,25 @@
             this.isDropdownShown = true;
         },
         _closeDropdown: function () {
+            this.dropdown.find('li').removeClass('sel');
             this.dropdown.hide();
             this.isDropdownShown = false;
+        },
+        _addItem: function (v) {
+            var label = v;
+            if (typeof v == 'object')
+                label = v.label || 'label ' + i;
+            var find = false;
+            this.element.children('span.item').each(function (i, span) {
+                if ($(span).text() == label) {
+                    find = true;
+                    return false;
+                }
+            });
+            if (find) return;
+            var item = $('<span class="item">').data(v).html(label)
+                .insertBefore(this.input);
+            $('<i class="del fa fa-times">').appendTo(item);
         }
     });
 })(jQuery);

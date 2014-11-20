@@ -27,11 +27,6 @@ html
       tr
         td
           #tags
-            span java
-              a.del.fa.fa-times
-            span spring
-            span c/c++
-            //input.ipt(style="width:16px")
         td(style="width:1%;")
           a#save_btn save
 
@@ -78,16 +73,18 @@ html
       }
 
       $('#tags').mipt({
-        autocomplete: [
-          {label: 'java', id: 1},
-          {label: 'javascript', id: 2},
-          {label: 'spring', id: 3},
-          {label: 'hibernate', id: 4},
-          {label: 'c/c++', id: 5},
-          {label: 'vb', id: 6}],
-        onSelected: function (data) {
-          console.log(data);
-          this.input.val('');
+        autocomplete: {
+          data: [
+            {label: 'java', id: 1},
+            {label: 'javascript', id: 2},
+            {label: 'spring', id: 3},
+            {label: 'hibernate', id: 4},
+            {label: 'c/c++', id: 5},
+            {label: 'vb', id: 6}],
+          onSelected: function (data) {
+            console.log(data);
+            this.input.val('');
+          }
         }
       });
 
