@@ -37,6 +37,7 @@ html
 
 
     script(type="text/javascript").
+      var id = 0;
       marked.setOptions({
         renderer: new marked.Renderer(),
         gfm: true,
@@ -74,19 +75,59 @@ html
 
       $('#tags').mipt({
         autocomplete: {
-          data: [
-            {label: 'java', id: 1},
-            {label: 'javascript', id: 2},
-            {label: 'spring', id: 3},
-            {label: 'hibernate', id: 4},
-            {label: 'c/c++', id: 5},
-            {label: 'vb', id: 6}],
+          data: !{tags},
           onSelected: function (data) {
-            console.log(data);
-            this.input.val('');
+
           }
         }
       });
+
+
+      // save article
+      $('#save_btn').click(function () {
+        var title = $('#title').val();
+        var tags = $('#tags').mipt('data');
+        var content = editor.getValue();
+
+        tags = $.map(tags, function (tag) {
+          return tag.id;
+        });
+
+        console.log(tags);
+
+        var xhr = $.ajax({
+          url: '/article/' + id + '/save',
+          type: 'POST',
+          data: {
+            title: title,
+            tags: tags.join(','),
+            content: content
+          }
+        });
+        xhr.done(function (data) {
+
+        });
+        xhr.fail(function (data) {
+
+        });
+      });
+
+    - if (article)
+      script.
+        id = !{article['id']};
+        editor.setValue('!{article['content']}');
+        $('#title').val('!{article['title']}');
+
+    - if(article)
+      script
+        - article.tags.forEach(function(tag) {
+          | $('#tags').mipt('addItem', {
+          |   id:!{tag.id},
+          |   label:'!{tag.name}'
+          | });
+        - });
+
+
 
 //      $('#tags').click(function () {
 //        $(this).find('input').focus();

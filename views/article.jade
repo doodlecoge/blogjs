@@ -1,10 +1,24 @@
 // Created by hch on 2014/11/6.
-
 extends layout
 block content
-  ul
-  -for(var i = 0; i < articles.length; i++)
-    -var a = articles[i];
-    li
-      a(href="/article/#{a.id}") #{a.title}
+  ul.al
+    - for(var id in articles) {
+      - var obj = articles[id]
+      - var tags = articles[id]['tags']
+      - var len = tags.length
+      li
+        a.title(href="/article/#{id}") #{obj.title}
+        p= obj.abs
+        - for(var i = 0; i < len; i++) {
+          span #{tags[i]}
+        - }
+        .edit
+          a(href="/article/#{id}/edit")
+            i.fa.fa-edit
+            | Edit
+          a(href="/article/#{id}/del")
+            i.fa.fa-times
+            | Delete
+    - }
+
 

@@ -21,25 +21,29 @@
                 });
             }
         }, prototype);
-        $.fn[name] = function (options) {
+        $.fn[name] = $.fn[name] || function (options) {
             var isMethodCall = typeof options === 'string';
             var args = Array.prototype.slice.call(arguments, 1);
-            this.each(function () {
+            var ret = undefined;
+            this.each(function (i) {
+                var r = undefined;
                 var ins = $.data(this, name);
                 if (isMethodCall) {
                     if (!ins) $.error('not initialized yet');
                     if (!$.isFunction(ins[options]) || options.charAt(0) === '_')
                         $.error('no such method: ' + options);
-                    ins[options].apply(ins, args);
+                    r = ins[options].apply(ins, args);
                 } else {
                     if (ins) {
-                        if (ins._init) ins._init();
+                        if (ins._init) r = ins._init();
                     } else {
-                        ins = new constructor(options, this);
+                        r = ins = new constructor(options, this);
                         $.data(this, name, ins);
                     }
                 }
+                if (i == 0) ret = r;
             });
+            return ret;
         }
     }
 
@@ -75,40 +79,29 @@
                 },
                 keydown: function (e) {
                     if (e.keyCode == 13) {
-                        var sel = this.dropdown.find('.sel');
-                        if (sel.length == 0) {
-                            var val = this.input.val();
-                            if (!this.options.autocomplete)
-                                this._addItem(val);
-                        } else {
-                            this.input.val(sel.html());
-                            this._updateInputWidth();
-                            if (this.options.autocomplete.onSelected) {
-                                var v = sel.data('val');
-                                this.options.autocomplete.onSelected
-                                    .call(this, v);
-                                this._addItem(v);
+                        if (this.options.autocomplete) {
+                            var sel = this.dropdown.find('.sel');
+                            if (sel.length != 0) {
+                                this.input.val(sel.html());
+                                this._updateInputWidth();
+                                if (this.options.autocomplete.onSelected) {
+                                    var v = sel.data('val');
+                                    this.options.autocomplete.onSelected
+                                        .call(this, v);
+                                    this._addItem(v);
+                                }
+                                if (this.dropdown) this._closeDropdown();
                             }
+                        } else {
+                            var val = $.trim(this.input.val());
+                            if (val != '') this._addItem(val);
                         }
-                        if (this.dropdown) this._closeDropdown();
                     } else if (e.keyCode == 38) {
-                        if (!this.isDropdownShown) return;
-                        var sel = this.dropdown.find('.sel').prev();
-                        if (sel.length == 0)
-                            sel = this.dropdown.children(':last');
-                        this.dropdown.children().removeClass('sel');
-                        sel.addClass('sel');
-                        this.input.val(sel.html());
+                        this._highlightPrevMenu();
                         this._updateInputWidth();
                         e.preventDefault();
                     } else if (e.keyCode == 40) {
-                        if (!this.isDropdownShown) return;
-                        var sel = this.dropdown.find('.sel').next();
-                        if (sel.length == 0)
-                            sel = this.dropdown.children(':first');
-                        this.dropdown.children().removeClass('sel');
-                        sel.addClass('sel');
-                        this.input.val(sel.html());
+                        this._highlightNextMenu();
                         this._updateInputWidth();
                         e.preventDefault();
                     }
@@ -158,21 +151,78 @@
             this.dropdown.hide();
             this.isDropdownShown = false;
         },
+        _highlightPrevMenu: function () {
+            if (!this.isDropdownShown)
+                this._showDropdown();
+            var sel = this.dropdown.find('.sel').prev();
+            if (sel.length == 0)
+                sel = this.dropdown.children(':last');
+            this.dropdown.children().removeClass('sel');
+            sel.addClass('sel');
+            this.input.val(sel.html());
+        },
+        _highlightNextMenu: function () {
+            if (!this.isDropdownShown)
+                this._showDropdown();
+            var sel = this.dropdown.find('.sel').next();
+            if (sel.length == 0)
+                sel = this.dropdown.children(':first');
+            this.dropdown.children().removeClass('sel');
+            sel.addClass('sel');
+            this.input.val(sel.html());
+        },
+        addItem: function (v) {
+            this._addItem(v);
+        },
         _addItem: function (v) {
             var label = v;
             if (typeof v == 'object')
-                label = v.label || 'label ' + i;
+                label = v.label || 'label ';
             var find = false;
             this.element.children('span.item').each(function (i, span) {
                 if ($(span).text() == label) {
-                    find = true;
+                    find = span;
                     return false;
                 }
             });
-            if (find) return;
-            var item = $('<span class="item">').data(v).html(label)
+            if (find) {
+                this._blink(label);
+                return;
+            }
+            var item = $('<span class="item">').data('val', v).html(label)
                 .insertBefore(this.input);
             $('<i class="del fa fa-times">').appendTo(item);
+            this.input.val('');
+        },
+        _blink: function (v) {
+            this.element.children('span.item').each(function (i, span) {
+                if ($(span).text() == v) {
+                    $(span).blink();
+                }
+            });
+        },
+        data: function () {
+            var a = $.map(this.element.children('span.item'),
+                function (span) {
+                    return $(span).data('val');
+                });
+            return a;
         }
     });
+
+
+    $.fn.blink = function () {
+        var _this = this;
+        var bak = this.css('color');
+        var i = 0;
+        var colors = ['#ff0', '#f00'];
+        var t = setInterval(function () {
+            _this.css('color', colors[i % 2]);
+            if (i++ > 5) {
+                clearTimeout(t);
+                _this.css('color', bak);
+            }
+        }, 100);
+
+    }
 })(jQuery);

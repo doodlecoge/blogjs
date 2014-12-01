@@ -30,11 +30,12 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var article = require('./routes/article');
 var tag = require('./routes/tag');
+var test = require('./routes/test');
 
 app.use('/', routes);
 app.use('/users', users);
 app.use('/article', article);
-app.use('/tag', tag);
+app.use('/test', test);
 
 
 

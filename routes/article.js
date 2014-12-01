@@ -3,9 +3,11 @@
  */
 var express = require('express');
 var router = express.Router();
-var db = require('../utils/db');
 var marked = require('../public/javascripts/marked');
-var dao = require('../utils/article_dao.js');
+var article_dao = require('../utils/article_dao.js');
+var tagDao = require('../utils/tag_dao.js');
+var userDao = require('../utils/user_dao.js');
+var async = require('async');
 
 marked.setOptions({
     renderer: new marked.Renderer(),
@@ -23,14 +25,24 @@ function mk(markedText) {
 }
 
 router.get('/', function (req, res) {
-    dao.getArticles(0, 10, function (err, rows, count) {
-        console.log(rows);
-        console.log('.............');
+    article_dao.getArticles(0, 10, function (err, rows, count) {
         if (err) {
             res.render('error');
         } else {
+            var obj = {};
+            var results = rows[1];
+            var len = results.length;
+            for (var i = 0; i < len; i++) {
+                var id = results[i]['id'];
+                if (!obj[id]) obj[id] = {tags: []};
+                obj[id]['title'] = results[i]['title'];
+                obj[id]['abs'] = results[i]['content'].substr(0, 200);
+                if (results[i]['tag']) {
+                    obj[id]['tags'].push(results[i]['tag']);
+                }
+            }
             res.render('article', {
-                articles: rows,
+                articles: obj,
                 page: 1,
                 size: 10,
                 count: count
@@ -48,7 +60,7 @@ router.get('/p/:idx', function (req, res) {
         page = 1;
     }
 
-    dao.getArticles(page, 10, function (err, rows, count) {
+    article_dao.getArticles(page, 10, function (err, rows, count) {
         if (err) {
             res.render('error');
         } else {
@@ -63,13 +75,25 @@ router.get('/p/:idx', function (req, res) {
 });
 
 router.get('/new', function (req, res) {
-    res.render('article_new');
+    tagDao.getTags(function (err, rows) {
+        var len = rows.length;
+        var data = [];
+        for (var i = 0; i < len; i++) {
+            data.push(JSON.stringify({
+                id: rows[i]['id'],
+                label: rows[i]['name']
+            }));
+        }
+        res.render('article_new', {
+            tags: '[' + data.join(',') + ']'
+        });
+    });
 });
 
 /* GET /article?id= */
 router.get('/:id', function (req, res) {
     var id = req.param('id');
-    dao.getArticleById(id, function (err, rows) {
+    article_dao.getArticleById(id, function (err, rows) {
         if (err || rows == null || rows.length != 1) {
             res.render('error');
         } else {
@@ -82,11 +106,48 @@ router.get('/:id', function (req, res) {
 });
 
 
-/* add new article */
-router.post('/', function (req, res) {
+/* save article */
+router.post('/:id/save', function (req, res) {
+    var id = req.param('id');
     var title = req.param('title');
     var content = req.param('content');
     var tags = req.param('tags');
+
+    article_dao.saveArticle(parseInt(id), title, '', 'huaichao',
+        eval('([' + tags + '])'), function () {
+            res.send('hello');
+        });
+});
+
+router.get('/:id/edit', function (req, res) {
+    var id = req.param('id');
+    var username = null;
+
+    async.series({
+        tags: function (cb) {
+            tagDao.getTags(cb);
+        },
+        article: function (cb) {
+            article_dao.getArticleById(id, function (err, rows) {
+                cb(err, rows);
+            });
+        }
+    }, function (err, results) {
+        var article = results['article'];
+        var tags = results['tags'];
+        var arr = [];
+        tags.forEach(function (tag) {
+            arr.push(JSON.stringify({
+                id: tag['id'],
+                label: tag['name']
+            }));
+        });
+        res.render('article_new', {
+            tags: '[' + arr.join(',') + ']',
+            article: article
+        });
+    });
+
 
 });
 
