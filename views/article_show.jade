@@ -11,9 +11,9 @@ block content
   - }
 
   h1(style="margin:0;") #{title}
-  .user
+  .user(style="margin: 5px 0 10px; color: #888;")
     | By !{user} @ !{fmt(created_at)},
-    | last updated @ !{fmt(updated_at)}
+    | last modified @ !{fmt(updated_at)}
   .tags
     - tags.forEach(function(tag, i) {
       span.tag= tag.name
