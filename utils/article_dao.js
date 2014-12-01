@@ -82,7 +82,9 @@ dao.getArticleById = function (id, callback) {
                 title: _article[0]['title'],
                 content: _article[0]['content'],
                 user: {},
-                tags: []
+                tags: [],
+                created_at: _article[0]['created_at'],
+                updated_at: _article[0]['updated_at']
             };
 
             article['user']['fullname'] = _user[0]['fullname'];
@@ -101,13 +103,12 @@ dao.getArticleById = function (id, callback) {
 ;
 
 
-dao.saveArticle = function (id, title, content, username, tags) {
+dao.saveArticle = function (id, title, content, username, tags, callback) {
     pool.getConnection(function (err, conn) {
         if (err) console.log(err);
 
         conn.beginTransaction(function (err) {
-            console.log('-----=====');
-            console.log(err);
+            if (err) console.log(err);
         });
 
         async.series([
@@ -136,22 +137,39 @@ dao.saveArticle = function (id, title, content, username, tags) {
                 });
             },
             function (cb) {
-                var len = tags.length;
-                for (var i = 0; i < len; i++) {
-                    var sql = 'insert into articles_tags ' +
-                        '(aid, tid) values (?,?)';
-                    conn.query(sql, [id, tags[i]], function (err, rows) {
-                        cb(err, rows);
-                    });
+
+                function fns() {
+                    var fns = [];
+                    var len = tags.length;
+                    for (var i = 0; i < len; i++) {
+                        fns.push(insert(id, tags[i]));
+                    }
+                    return fns;
                 }
+
+                function insert(aid, tid) {
+                    return function (cb) {
+                        var sql = 'insert into articles_tags ' +
+                            '(aid, tid) values (?,?)';
+                        conn.query(sql, [aid, tid], function (err, rows) {
+                            console.log('aid:' + aid + ',tid:' + tid);
+                            cb(err, rows);
+                        });
+                    }
+                }
+
+                async.series(fns(), function (err, rows) {
+                    cb(err, rows);
+                });
+
             }
         ], function (err, rows) {
-            console.log("**********" + err);
             conn.release();
             if (err)
                 conn.rollback();
             else
                 conn.commit();
+            callback(err);
         });
     });
 };

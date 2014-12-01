@@ -2,9 +2,21 @@
 
 extends layout
 block content
+  - function fmt(date) {
+  -   var arr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  -   var y = date.getFullYear();
+  -   var m = date.getMonth();
+  -   var d = date.getDate();
+  -   return arr[m] + '/' + d + '/' + y;
+  - }
 
-  h1 #{title}
-  #tags
-    a 1111
-  hr
+  h1(style="margin:0;") #{title}
+  .user
+    | By !{user} @ !{fmt(created_at)},
+    | last updated @ !{fmt(updated_at)}
+  .tags
+    - tags.forEach(function(tag, i) {
+      span.tag= tag.name
+    - })
+
   | !{content}

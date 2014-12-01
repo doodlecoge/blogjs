@@ -93,13 +93,17 @@ router.get('/new', function (req, res) {
 /* GET /article?id= */
 router.get('/:id', function (req, res) {
     var id = req.param('id');
-    article_dao.getArticleById(id, function (err, rows) {
-        if (err || rows == null || rows.length != 1) {
+    article_dao.getArticleById(id, function (err, article) {
+        if (err) {
             res.render('error');
         } else {
             res.render('article_show', {
-                title: rows[0].title,
-                content: mk(rows[0].content)
+                title: article.title,
+                content: mk(article.content),
+                tags: article.tags,
+                user: article.user.fullname,
+                created_at: article.created_at,
+                updated_at: article.updated_at
             });
         }
     });
@@ -113,7 +117,7 @@ router.post('/:id/save', function (req, res) {
     var content = req.param('content');
     var tags = req.param('tags');
 
-    article_dao.saveArticle(parseInt(id), title, '', 'huaichao',
+    article_dao.saveArticle(parseInt(id), title, content, 'huaichao',
         eval('([' + tags + '])'), function () {
             res.send('hello');
         });

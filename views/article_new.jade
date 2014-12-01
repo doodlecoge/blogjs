@@ -34,6 +34,10 @@ html
       #editor
       #viewer
 
+    - if(article)
+      textarea#original_content(style="visibility: hidden;").
+        !{article['content']}
+
 
 
     script(type="text/javascript").
@@ -115,7 +119,7 @@ html
     - if (article)
       script.
         id = !{article['id']};
-        editor.setValue('!{article['content']}');
+        editor.setValue($('#original_content').val());
         $('#title').val('!{article['title']}');
 
     - if(article)
