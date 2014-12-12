@@ -4,6 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+var MemStore = session.MemoryStore;
 
 
 var app = express();
@@ -18,6 +20,14 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use(session({
+    secret: 'huaichao',
+    resave: false,
+    saveUninitialized: false,
+    store: new MemStore({
+        reapInterval: 60000 * 10
+    })
+}));
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -35,9 +45,8 @@ var test = require('./routes/test');
 app.use('/', routes);
 app.use('/users', users);
 app.use('/article', article);
+app.use('/tag', tag);
 app.use('/test', test);
-
-
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -52,6 +61,7 @@ app.use(function (req, res, next) {
 // will print stacktrace
 if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
+        console.log("=========here get an error==========");
         res.status(err.status || 500);
         res.render('error', {
             message: err.message,
@@ -63,6 +73,7 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function (err, req, res, next) {
+    console.log("=========here got an error==========");
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,

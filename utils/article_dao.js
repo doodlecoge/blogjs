@@ -44,14 +44,20 @@ dao.getArticles = function (page, size, callback) {
 
 dao.getArticleById = function (id, callback) {
     pool.getConnection(function (err, conn) {
-        if (err) console.log(err);
+        if (err) throw err;
         var username = null;
         async.series({
             article: function (cb) {
                 var sql = 'select * from articles where id=?';
                 conn.query(sql, [id], function (err, rows) {
-                    username = rows[0]['username'];
-                    cb(err, rows);
+                    if (err) {
+                        cb(err, rows);
+                    } else if (rows.length == 0) {
+                        cb('article not found ' + id);
+                    } else {
+                        username = rows[0]['username'];
+                        cb(err, rows);
+                    }
                 });
             },
             user: function (cb) {
@@ -72,6 +78,10 @@ dao.getArticleById = function (id, callback) {
             }
         }, function (err, results) {
             conn.release();
+            if (err) {
+                callback(err);
+                return;
+            }
 
             var _article = results['article'];
             var _user = results['user'];
@@ -99,8 +109,36 @@ dao.getArticleById = function (id, callback) {
             callback(err, article);
         });
     });
-}
-;
+};
+
+
+dao.deleteArticle = function (id, callback) {
+    pool.getConnection(function (err, conn) {
+        if (err) throw err;
+        async.series({
+            tags: function (cb) {
+                var sql = 'delete from articles_tags where aid=?';
+                conn.query(sql, [id], function (err, rows) {
+                    cb(err, rows);
+                });
+            },
+            article: function (cb) {
+                var sql = 'delete from articles where id=?';
+                conn.query(sql, [id], function (err, rows) {
+                    cb(err, rows);
+                });
+            }
+        }, function (err, results) {
+            console.log(err);
+            conn.release();
+            if (err)
+                conn.rollback();
+            else
+                conn.commit();
+            callback(err, results);
+        });
+    });
+};
 
 
 dao.saveArticle = function (id, title, content, username, tags, callback) {

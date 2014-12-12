@@ -95,17 +95,21 @@ router.get('/:id', function (req, res) {
     var id = req.param('id');
     article_dao.getArticleById(id, function (err, article) {
         if (err) {
-            res.render('error');
-        } else {
-            res.render('article_show', {
-                title: article.title,
-                content: mk(article.content),
-                tags: article.tags,
-                user: article.user.fullname,
-                created_at: article.created_at,
-                updated_at: article.updated_at
+            res.render('error', {
+                error: err
             });
+            return;
         }
+        res.render('article_show', {
+            id: id,
+            title: article.title,
+            content: mk(article.content),
+            tags: article.tags,
+            user: article.user.fullname,
+            created_at: article.created_at,
+            updated_at: article.updated_at
+        });
+
     });
 });
 
@@ -125,18 +129,22 @@ router.post('/:id/save', function (req, res) {
 
 router.get('/:id/edit', function (req, res) {
     var id = req.param('id');
-    var username = null;
-
     async.series({
         tags: function (cb) {
             tagDao.getTags(cb);
         },
         article: function (cb) {
             article_dao.getArticleById(id, function (err, rows) {
+                console.log("==2==============>" + err);
                 cb(err, rows);
             });
         }
     }, function (err, results) {
+        console.log("================>" + err);
+        if (err) {
+            next(err);
+            return;
+        }
         var article = results['article'];
         var tags = results['tags'];
         var arr = [];
@@ -151,8 +159,14 @@ router.get('/:id/edit', function (req, res) {
             article: article
         });
     });
+});
 
 
+router.get('/:id/del', function (req, res) {
+    var id = req.param('id');
+    article_dao.deleteArticle(id, function () {
+        res.redirect('/article');
+    });
 });
 
 module.exports = router;

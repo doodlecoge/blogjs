@@ -6,10 +6,20 @@ html
     link(rel='stylesheet', href='/css/font-awesome.min.css')
     block css
   body
-    div#nav
-      div.c
-        a Home
-        a Write Sth.
+    #nav
+      .c
+        .login(style="float: right;")
+          - if(req.session['user'] == null)
+            a(href="/login") Sign In
+          - else
+            | Welcome,&nbsp;
+            a(href="javascript:;") #{req.session['user'].fullname}
+            | &nbsp;
+            a(href="/logout") Sign Out
+        .menus
+          a(href="/") Home
+          a(href="/article") Articles
+          a(href="/article/new") Write Sth.
     div#header
       div.c Online Notes
     div#content.c
