@@ -42,11 +42,36 @@ var article = require('./routes/article');
 var tag = require('./routes/tag');
 var test = require('./routes/test');
 
-app.use('/', routes);
-app.use('/users', users);
-app.use('/article', article);
-app.use('/tag', tag);
+app.use(function (req, res, next) {
+    if (req.session['user']) return next();
+
+    delete req.session.error;
+    var path = req.path;
+
+    var nologin_ptns = [
+        /^\/$/,                 // index
+        /^\/login$/,            // login
+        /^\/logout$/,           // logout
+        /^\/article$/,          // article list
+        /^\/article\/[0-9]+$/,  // article display page
+    ];
+
+    for (var i = 0; i < nologin_ptns.length; i++) {
+        if (path.match(nologin_ptns[i])) {
+            next();
+            return;
+        }
+    }
+
+    req.session.error = 'Session expired or you are not signed in';
+    res.redirect('/login');
+});
+
 app.use('/test', test);
+app.use('/', routes);
+app.use('/article', article);
+app.use('/users', users);
+app.use('/tag', tag);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

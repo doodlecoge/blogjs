@@ -2,27 +2,23 @@
 
 extends layout
 block content
-  - function fmt(date) {
-  -   var arr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  -   var y = date.getFullYear();
-  -   var m = date.getMonth();
-  -   var d = date.getDate();
-  -   return arr[m] + '/' + d + '/' + y;
-  - }
+
 
   h1(style="margin:0;") #{title}
   .user(style="margin: 5px 0 10px; color: #888;")
-    | By !{user} @ !{fmt(created_at)},
+    | By !{user.fullname} @ !{fmt(created_at)},
     | last modified @ !{fmt(updated_at)} &nbsp;
-    - if(username !== null)
-      .edit(style="float: right")
-        a(href="#{id}/edit", class="fa fa-edit") &nbsp;Edit
-        | &nbsp;
-        a(href="#{id}/del", class="fa fa-times") &nbsp;Delete
+
   .tags
-    - tags.forEach(function(tag, i) {
+    - tags.forEach(function(tag) {
       span.tag= tag.name
     - })
+  - if(req.session['user'] && req.session['user'].username == user.username)
+    .edit(style="margin-top: 10px;")
+      a(href="#{id}/edit", class="fa fa-edit") &nbsp;Edit
+      | &nbsp;
+      a(href="#{id}/del", class="fa fa-times") &nbsp;Delete
 
+  hr
 
   | !{content}

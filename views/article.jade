@@ -1,34 +1,41 @@
 // Created by hch on 2014/11/6.
 extends layout
 
-mixin piece(obj, tags, len)
-  a.title(href="/article/#{id}") #{obj.title}
-  p= obj.abs
-  - for(var i = 0; i < len; i++) {
-    span #{tags[i]}
-  - }
+mixin piece(id, a)
+  a.title(href="/article/#{id}") #{a.article.title}
+  p= a.article.content
+  - a.tags.forEach(function(tag) {
+    span= tag.name
+  - })
+  .author(style="color: #888;")
+    | #{a.user.fullname} @ #{fmt(a.article.created_at)}
   .edit
-    a(href="/article/#{id}/edit")
-      i.fa.fa-edit
-      | Edit
-    a(href="/article/#{id}/del")
-      i.fa.fa-times
-      | Delete
+    - if(req.session['user'] && req.session['user'].username == a.user.username)
+      a(href="/article/#{id}/edit")
+        i.fa.fa-edit
+        | Edit
+      a(href="/article/#{id}/del")
+        i.fa.fa-times
+        | Delete
 
 
 block content
   ul.al
     - var i = 0
     - for(var id in articles) {
-      - var obj = articles[id];
-      - var tags = articles[id]['tags'];
-      - var len = tags.length;
       - if(i++ % 2 == 0)
         li(style="background: #eee")
-          +piece(obj, tags, len)
+          +piece(id, articles[id])
       - else
         li
-          +piece(obj, tags, len)
+          +piece(id, articles[id])
     - }
 
+
+  script(type="text/javascript").
+    $('ul.al').click(function(e){
+      var el = $(e.target);
+      if(!el.hasClass('fa-times')) return;
+      var b = confirm('delete?');
+    });
 

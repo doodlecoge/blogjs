@@ -10,34 +10,91 @@ module.exports = dao;
 
 dao.getArticles = function (page, size, callback) {
     pool.getConnection(function (err, conn) {
-        if (err) console.log(err);
+        if (err) throw err;
 
-        var count = null;
-        size = Math.max(size, 10);
-        var start = Math.max((page - 1) * size, 0);
-
-        async.series([
+        async.waterfall([
+            // get count of articles
             function (cb) {
                 var sql = 'select count(*) cnt from articles';
                 conn.query(sql, function (err, rows) {
-                    count = rows[0]['cnt'];
-                    if (start >= count)
-                        start = Math.floor(count / size) * size;
-                    cb(err, rows);
+                    if (err) {
+                        cb(err);
+                    } else {
+                        var count = rows[0]['cnt'];
+                        cb(err, count);
+                    }
                 });
             },
-            function (cb) {
-                var sql = 'select a.id,a.title,a.content,t.name tag from ' +
-                    '(select * from articles limit ?,?) a ' +
-                    'left join articles_tags at on a.id=at.aid ' +
-                    'left join tags t on at.tid=t.id';
+            // get articles
+            function (count, cb) {
+                if (count == 0) {
+                    cb('no record');
+                    return;
+                }
+                page = Math.max(0, page);
+                size = Math.max(10, size);
+                var start = page * size;
+                if (start >= count)
+                    start = Math.floor((count - 1) / size) * size;
+
+                var sql = '' +
+                    'select a.*, u.fullname from articles a ' +
+                    'left join users u ' +
+                    'on a.username = u.username ' +
+                    'order by updated_at desc ' +
+                    'limit ?,?';
                 conn.query(sql, [start, size], function (err, rows) {
-                    cb(err, rows);
+                    if (err) {
+                        cb(err);
+                        return;
+                    }
+
+                    var articles = {};
+                    rows.forEach(function (row) {
+                        articles[row.id] = {
+                            article: {
+                                title: row.title,
+                                content: row.content,
+                                created_at: row.created_at,
+                                updated_at: row.updated_at
+                            },
+                            user: {
+                                username: row.username,
+                                fullname: row.fullname
+                            },
+                            tags: []
+                        };
+                    });
+
+                    cb(err, articles, count);
+                });
+            },
+            // set tags
+            function (articles, count, cb) {
+                var ids = Object.keys(articles);
+                // tags
+                var sql = '' +
+                    'select t.id, t.name, at.aid from articles_tags at ' +
+                    'left join tags t ' +
+                    'on at.tid=t.id ' +
+                    'where at.aid in (?)';
+                conn.query(sql, [ids], function (err, tags) {
+                    if (err) {
+                        cb(err);
+                        return;
+                    }
+                    tags.forEach(function (tag) {
+                        articles[tag.aid].tags.push({
+                            id: tag.id,
+                            name: tag.name
+                        });
+                    });
+                    cb(err, articles, count);
                 });
             }
-        ], function (err, rows) {
+        ], function (err, articles, count) {
             conn.release();
-            callback(err, rows);
+            callback(err, articles, count);
         });
     });
 };
@@ -97,6 +154,7 @@ dao.getArticleById = function (id, callback) {
                 updated_at: _article[0]['updated_at']
             };
 
+            article['user']['username'] = _user[0]['username'];
             article['user']['fullname'] = _user[0]['fullname'];
 
             _tags.forEach(function (tag, i) {
@@ -129,12 +187,11 @@ dao.deleteArticle = function (id, callback) {
                 });
             }
         }, function (err, results) {
-            console.log(err);
-            conn.release();
             if (err)
                 conn.rollback();
             else
                 conn.commit();
+            conn.release();
             callback(err, results);
         });
     });

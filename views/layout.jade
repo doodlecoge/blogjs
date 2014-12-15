@@ -4,6 +4,7 @@ html
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/css/font-awesome.min.css')
+    script(type='text/javascript', src='/javascripts/jquery-1.11.1.js')
     block css
   body
     #nav
@@ -24,3 +25,13 @@ html
       div.c Online Notes
     div#content.c
       block content
+
+// functions
+- function fmt(date) {
+-   var arr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+-   var y = date.getFullYear();
+-   var m = date.getMonth();
+-   var d = date.getDate();
+-   if(d < 10) d = '0' + d;
+-   return arr[m] + '/' + d + '/' + y;
+- }

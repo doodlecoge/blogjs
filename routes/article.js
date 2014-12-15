@@ -25,24 +25,17 @@ function mk(markedText) {
 }
 
 router.get('/', function (req, res) {
-    article_dao.getArticles(0, 10, function (err, rows, count) {
+    article_dao.getArticles(0, 10, function (err, articles, count) {
         if (err) {
             res.render('error');
         } else {
-            var obj = {};
-            var results = rows[1];
-            var len = results.length;
-            for (var i = 0; i < len; i++) {
-                var id = results[i]['id'];
-                if (!obj[id]) obj[id] = {tags: []};
-                obj[id]['title'] = results[i]['title'];
-                obj[id]['abs'] = results[i]['content'].substr(0, 200);
-                if (results[i]['tag']) {
-                    obj[id]['tags'].push(results[i]['tag']);
-                }
-            }
+            var keys = Object.keys(articles);
+            keys.forEach(function (aid) {
+                var c = articles[aid].content || "";
+                articles[aid].content = c.substring(0, 10);
+            });
             res.render('article', {
-                articles: obj,
+                articles: articles,
                 page: 1,
                 size: 10,
                 count: count
@@ -105,7 +98,7 @@ router.get('/:id', function (req, res) {
             title: article.title,
             content: mk(article.content),
             tags: article.tags,
-            user: article.user.fullname,
+            user: article.user,
             created_at: article.created_at,
             updated_at: article.updated_at
         });
