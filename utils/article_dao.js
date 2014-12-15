@@ -232,6 +232,9 @@ dao.saveArticle = function (id, title, content, username, tags, callback) {
                 });
             },
             function (cb) {
+                if (tags.length == 0)
+                    var sql = 'insert into articles_tags (aid, tid) values ';
+
 
                 function fns() {
                     var fns = [];
@@ -259,12 +262,12 @@ dao.saveArticle = function (id, title, content, username, tags, callback) {
 
             }
         ], function (err, rows) {
-            conn.release();
             if (err)
                 conn.rollback();
             else
                 conn.commit();
-            callback(err);
+            conn.release();
+            callback(err, id);
         });
     });
 };

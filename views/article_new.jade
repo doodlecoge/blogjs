@@ -97,8 +97,6 @@ html
           return tag.id;
         });
 
-        console.log(tags);
-
         var xhr = $.ajax({
           url: '/article/' + id + '/save',
           type: 'POST',
@@ -106,10 +104,11 @@ html
             title: title,
             tags: tags.join(','),
             content: content
-          }
+          },
+          dataType: 'json'
         });
         xhr.done(function (data) {
-          location.href = '/article/' + id;
+          location.href = '/article/' + data.id;
         });
         xhr.fail(function (data) {
 

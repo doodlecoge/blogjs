@@ -114,10 +114,20 @@ router.post('/:id/save', function (req, res) {
     var content = req.param('content');
     var tags = req.param('tags');
 
-    article_dao.saveArticle(parseInt(id), title, content, 'huaichao',
-        eval('([' + tags + '])'), function () {
-            res.send('hello');
-        });
+    var arr = tags.split(',');
+    var tids = arr.map(function (str) {
+        try {
+            return parseInt(str);
+        } catch (e) {
+        }
+    });
+
+    article_dao.saveArticle(
+        parseInt(id), title, content, 'huaichao', tids,
+        function (err, id) {
+            res.send(JSON.stringify({id: id}));
+        }
+    );
 });
 
 router.get('/:id/edit', function (req, res) {
@@ -128,12 +138,10 @@ router.get('/:id/edit', function (req, res) {
         },
         article: function (cb) {
             article_dao.getArticleById(id, function (err, rows) {
-                console.log("==2==============>" + err);
                 cb(err, rows);
             });
         }
     }, function (err, results) {
-        console.log("================>" + err);
         if (err) {
             next(err);
             return;
