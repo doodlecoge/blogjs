@@ -31,7 +31,9 @@ router.post('/login', function (req, res) {
     user_dao.getUser(username, function (err, user) {
         if (user != null && user.password == password) {
             req.session['user'] = user;
-            res.redirect('/');
+            var url = req.session.original_url || '/';
+            delete req.session.original_url;
+            res.redirect(url);
         } else {
             res.render('login', {
                 error: 'username or password incorrect'

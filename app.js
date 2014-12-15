@@ -25,7 +25,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: new MemStore({
-        reapInterval: 60000 * 10
+        reapInterval: 60
     })
 }));
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
@@ -64,6 +64,7 @@ app.use(function (req, res, next) {
     }
 
     req.session.error = 'Session expired or you are not signed in';
+    req.session.original_url = path;
     res.redirect('/login');
 });
 
