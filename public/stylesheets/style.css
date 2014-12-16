@@ -1,7 +1,7 @@
 body {
   margin: 0;
   background: #f0f0f0;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font-family: Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;
 }
 .c {
   width: 1000px;
@@ -31,13 +31,13 @@ body {
 #nav .c {
   line-height: 30px;
 }
-#nav .c a {
+#nav .c .menus a {
   text-decoration: none;
   font-weight: bold;
   color: #69c;
   margin-right: 20px;
 }
-#nav .c a:hover {
+#nav .c .menus a:hover {
   color: #c66;
 }
 #footer .c {
@@ -76,4 +76,66 @@ ul.tags li a {
 }
 ul.tags li a:hover {
   color: #f00;
+}
+/*=======================================================*/
+ul.al {
+  margin: 0;
+  padding: 0;
+}
+ul.al li {
+  list-style: none;
+  padding: 10px;
+  border-bottom: 1px dashed #ccc;
+}
+ul.al li a.title {
+  display: block;
+  line-height: 40px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #146;
+}
+ul.al li span {
+  display: -moz-inline-stack;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+  line-height: 25px;
+  padding: 0 10px;
+  margin-right: 10px;
+  background: #69c;
+  color: #eee;
+}
+ul.al li div {
+  padding-top: 10px;
+}
+ul.al li div a {
+  margin-right: 10px;
+  text-decoration: none;
+  color: #444;
+}
+.tags span.tag {
+  background: #69c;
+  padding: 2px 10px;
+  margin-right: 10px;
+}
+/*=======================================================*/
+.pager .page {
+  min-width: 40px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  border: 1px solid #ccc;
+  margin-right: 5px;
+  background: #eee;
+  text-decoration: none;
+  display: -moz-inline-stack;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+}
+.pager .page:hover {
+  border-color: #69c;
+}
+.pager .page.dis {
+  border-color: transparent;
 }

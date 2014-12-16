@@ -24,9 +24,7 @@ app.use(session({
     secret: 'huaichao',
     resave: false,
     saveUninitialized: false,
-    store: new MemStore({
-        reapInterval: 60
-    })
+    cookie: {maxAge: 60 * 10 * 1000}
 }));
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -53,7 +51,7 @@ app.use(function (req, res, next) {
         /^\/login$/,                // login
         /^\/logout$/,               // logout
         /^\/article$/,              // article list
-        /^\/article\/[0-9]+\/p$/,   // article paging
+        /^\/article\/p\/[0-9]+$/,   // article paging
         /^\/article\/[0-9]+$/,      // article display page
     ];
 
