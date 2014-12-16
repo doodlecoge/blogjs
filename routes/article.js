@@ -25,27 +25,12 @@ function mk(markedText) {
 }
 
 router.get('/', function (req, res) {
-    article_dao.getArticles(0, 10, function (err, articles, count) {
-        if (err) {
-            res.render('error');
-        } else {
-            var keys = Object.keys(articles);
-            keys.forEach(function (aid) {
-                var c = articles[aid].content || "";
-                articles[aid].content = c.substring(0, 10);
-            });
-            res.render('article', {
-                articles: articles,
-                page: 1,
-                size: 10,
-                count: count
-            });
-        }
-    });
+    res.redirect('/article/p/' + 1);
 });
 
 router.get('/p/:idx', function (req, res) {
     var page = req.param('idx');
+    var size = 10;
 
     try {
         page = parseInt(page);
@@ -53,15 +38,19 @@ router.get('/p/:idx', function (req, res) {
         page = 1;
     }
 
-    article_dao.getArticles(page, 10, function (err, rows, count) {
+    article_dao.getArticles(page, size, function (err, articles, count) {
         if (err) {
             res.render('error');
         } else {
+            articles.forEach(function (a) {
+                var c = a.article.content || "";
+                a.article.content = c.substring(0, 200);
+            });
             res.render('article', {
-                articles: rows,
+                articles: articles,
                 page: page,
                 size: 10,
-                count: count
+                pages: Math.floor((count + size - 1) / size)
             });
         }
     });

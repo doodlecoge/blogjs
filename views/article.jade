@@ -1,7 +1,8 @@
 // Created by hch on 2014/11/6.
 extends layout
 
-mixin piece(id, a)
+mixin piece(a)
+  - var id = a.article.id;
   a.title(href="/article/#{id}") #{a.article.title}
   p= a.article.content
   - a.tags.forEach(function(tag) {
@@ -18,18 +19,43 @@ mixin piece(id, a)
         i.fa.fa-times
         | Delete
 
-
+mixin paging(pages, page)
+  .pager
+    - var page = Math.min(page, pages);
+    - var s = Math.max(1, page - 5);
+    - var e = Math.min(pages, s + 10);
+    - s = Math.min(e - 10, s);
+    - s = Math.max(1, s);
+    - if(page == 1)
+      a.page.dis &nbsp;<<&nbsp;
+    - else
+      a.page(href="/article/p/1") &nbsp;<<&nbsp;
+    - for(var i = s;i <= e; i++) {
+      - if(i == page)
+        a.page.dis= i
+      - else
+        a.page(href="/article/p/#{i}")= i
+    - }
+    - if(page == pages)
+      a.page.dis &nbsp;>>&nbsp;
+    - else
+      a.page(href="/article/p/#{pages}") &nbsp;>>&nbsp;
+    a.page.dis &nbsp;page #{page} of #{pages}&nbsp;
 block content
+  +paging(pages, page)
+  br
   ul.al
     - var i = 0
-    - for(var id in articles) {
+    - articles.forEach(function(a) {
       - if(i++ % 2 == 0)
         li(style="background: #eee")
-          +piece(id, articles[id])
+          +piece(a)
       - else
         li
-          +piece(id, articles[id])
-    - }
+          +piece(a)
+    -})
+  br
+  +paging(pages, page)
 
 
   script(type="text/javascript").

@@ -49,11 +49,12 @@ app.use(function (req, res, next) {
     var path = req.path;
 
     var nologin_ptns = [
-        /^\/$/,                 // index
-        /^\/login$/,            // login
-        /^\/logout$/,           // logout
-        /^\/article$/,          // article list
-        /^\/article\/[0-9]+$/,  // article display page
+        /^\/$/,                     // index
+        /^\/login$/,                // login
+        /^\/logout$/,               // logout
+        /^\/article$/,              // article list
+        /^\/article\/[0-9]+\/p$/,   // article paging
+        /^\/article\/[0-9]+$/,      // article display page
     ];
 
     for (var i = 0; i < nologin_ptns.length; i++) {

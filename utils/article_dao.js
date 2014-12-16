@@ -31,9 +31,9 @@ dao.getArticles = function (page, size, callback) {
                     cb('no record');
                     return;
                 }
-                page = Math.max(0, page);
+                page = Math.max(1, page);
                 size = Math.max(10, size);
-                var start = page * size;
+                var start = (page - 1) * size;
                 if (start >= count)
                     start = Math.floor((count - 1) / size) * size;
 
@@ -49,10 +49,11 @@ dao.getArticles = function (page, size, callback) {
                         return;
                     }
 
-                    var articles = {};
+                    var articles = [];
                     rows.forEach(function (row) {
-                        articles[row.id] = {
+                        articles.push({
                             article: {
+                                id: row.id,
                                 title: row.title,
                                 content: row.content,
                                 created_at: row.created_at,
@@ -63,7 +64,7 @@ dao.getArticles = function (page, size, callback) {
                                 fullname: row.fullname
                             },
                             tags: []
-                        };
+                        });
                     });
 
                     cb(err, articles, count);
@@ -71,7 +72,9 @@ dao.getArticles = function (page, size, callback) {
             },
             // set tags
             function (articles, count, cb) {
-                var ids = Object.keys(articles);
+                var ids = articles.map(function (a) {
+                    return a.article.id;
+                });
                 // tags
                 var sql = '' +
                     'select t.id, t.name, at.aid from articles_tags at ' +
@@ -83,11 +86,17 @@ dao.getArticles = function (page, size, callback) {
                         cb(err);
                         return;
                     }
+                    var atMap = {};
                     tags.forEach(function (tag) {
-                        articles[tag.aid].tags.push({
+                        if (!atMap[tag.aid]) atMap[tag.aid] = [];
+                        atMap[tag.aid].push({
                             id: tag.id,
                             name: tag.name
                         });
+                    });
+                    articles.forEach(function (a) {
+                        var aid = a.article.id;
+                        a.tags = atMap[aid] || [];
                     });
                     cb(err, articles, count);
                 });
