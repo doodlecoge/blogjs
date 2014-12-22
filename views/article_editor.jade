@@ -33,11 +33,17 @@ block content
     tr
       td.t(style="width:1%; background: #ccc;")
         span(style="line-height:30px") Image of post:
-      td
+      td(style="font-size:0;")
         img.alogo(src="/upload/images/alogo/no-img.png",title="click to change")
-  br
-  #editor
-  #viewer
+        input(type="hidden", value="0")
+    tr
+      td(style="height: 5px")
+    tr
+      td.t(style="width:1%; background: #ccc;")
+        span(style="line-height:30px") Content:
+      td
+        #editor
+        #viewer
 
   - if(article)
     textarea#original_content(style="visibility: hidden;").
