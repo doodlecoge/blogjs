@@ -44,6 +44,8 @@ block content
       td
         #editor
         #viewer
+  p#images.
+    The quick brown fox jumps over the lazy dog.
 
   - if(article)
     textarea#original_content(style="visibility: hidden;").
@@ -52,6 +54,17 @@ block content
 
 
   script(type="text/javascript").
+    $("#images").dialog({
+      title: 'Hello World',
+      buttons: {
+        'OK': function (e, dlg) {
+          console.log(e.target);
+        },
+        'Cancel': function (e, dlg) {
+          dlg._close();
+        }
+      }
+    });
     var id = 0;
     marked.setOptions({
       renderer: new marked.Renderer(),

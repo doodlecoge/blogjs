@@ -6,7 +6,16 @@ border-radius()
   -ms-border-radius arguments
   -o-border-radius arguments
   border-radius arguments
-
+fontFamily=font-family Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;
+.global_overlay
+  position absolute
+  top 0px
+  right 0px
+  bottom 0px
+  left 0px
+  z-index 10000
+  opacity 0.3
+  background #000
 
 #ac_dropdown
   position absolute
@@ -76,3 +85,36 @@ border-radius()
   cursor pointer
 .mipt span.item .del:hover
   color: #f00
+
+/*================================================*/
+
+.dlg
+  position absolute
+  background #fff
+  border-radius(5px)
+  shadow()
+  z-index 10001
+.dlg_title
+  line-height 40px
+  padding 0 10px
+  border-bottom 1px solid #ccc
+  background #ccc
+  border-radius 5px 5px 0 0
+.dlg_close_btn
+  float right
+  color orangered
+  text-decoration none
+.dlg_close_btn:hover
+  color #f00
+.dlg_close_btn:active
+  color orangered
+.dlg_content
+  padding 10px
+.dlg_btn_set
+  line-height 40px
+  text-align center
+  border-top 1px solid #ccc
+.dlg_btn_set button
+  padding 3px 20px
+  font-family fontFamily
+  font-size 16px
