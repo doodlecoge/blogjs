@@ -24,7 +24,6 @@ router.post('/new', function (req, res) {
     if (name.trim() == '') {
         res.end();
     }
-    console.log('adding tag: ' + name);
     tag_dao.addTag(name, function (err, result) {
         res.redirect('/tag');
     });

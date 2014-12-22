@@ -98,10 +98,23 @@ ul.al li
   list-style none
   padding 10px
   border-bottom 1px dashed #ccc
+  display block
+ul.al li:before
+  content " "
+  clear both
+ul.al li:after
+  content " "
+  display table
+  clear both
+ul.al li div.img
+  float left
+  height 120px
+  width 120px
+ul.al li div.summary
+  margin-left 140px
 ul.al li a.title
   display block
-  line-height 40px
-  font-size 16px
+  font-size 24px
   font-weight bold
   color #146
 ul.al li span
@@ -114,7 +127,6 @@ ul.al li span
 ul.al li div
   padding-top 10px
 ul.al li div a
-  margin-right 10px
   text-decoration none
   color #444
 

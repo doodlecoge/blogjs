@@ -2,22 +2,27 @@
 extends layout
 
 mixin piece(a)
-  - var id = a.article.id;
-  a.title(href="/article/#{id}") #{a.article.title}
-  p= a.article.content
-  - a.tags.forEach(function(tag) {
-    span= tag.name
-  - })
-  .author(style="color: #888;")
-    | #{a.user.fullname} @ #{fmt(a.article.created_at)}
-  .edit
-    - if(req.session['user'] && req.session['user'].username == a.user.username)
-      a(href="/article/#{id}/edit")
-        i.fa.fa-edit
-        | Edit
-      a(href="/article/#{id}/del")
-        i.fa.fa-times
-        | Delete
+  .img
+    img(src="/upload/images/alogo/no-img.png",
+      style="border:1px solid #ccc;")
+
+  .summary
+    - var id = a.article.id;
+    a.title(href="/article/#{id}") #{a.article.title}
+    p= a.article.content
+    - a.tags.forEach(function(tag) {
+      span= tag.name
+    - })
+    .author(style="color: #888;")
+      | By #{a.user.fullname} @ #{fmt(a.article.created_at)}
+    .edit
+      - if(req.session['user'] && req.session['user'].username == a.user.username)
+        a(href="/article/#{id}/edit")
+          i.fa.fa-edit
+          | Edit
+        a(href="/article/#{id}/del")
+          i.fa.fa-times
+          | Delete
 
 mixin paging(pages, page)
   .pager
@@ -47,12 +52,8 @@ block content
   ul.al
     - var i = 0
     - articles.forEach(function(a) {
-      - if(i++ % 2 == 0)
-        li(style="background: #eee")
-          +piece(a)
-      - else
-        li
-          +piece(a)
+      li
+        +piece(a)
     -})
   br
   +paging(pages, page)

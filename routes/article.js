@@ -72,6 +72,22 @@ router.get('/new', function (req, res) {
     });
 });
 
+router.get('/editor', function(req, res) {
+    tagDao.getTags(function (err, rows) {
+        var len = rows.length;
+        var data = [];
+        for (var i = 0; i < len; i++) {
+            data.push(JSON.stringify({
+                id: rows[i]['id'],
+                label: rows[i]['name']
+            }));
+        }
+        res.render('article_editor', {
+            tags: '[' + data.join(',') + ']'
+        });
+    });
+});
+
 /* GET /article?id= */
 router.get('/:id', function (req, res) {
     var id = req.param('id');
@@ -158,5 +174,8 @@ router.get('/:id/del', function (req, res) {
         res.redirect('/article');
     });
 });
+
+
+
 
 module.exports = router;

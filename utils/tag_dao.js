@@ -22,8 +22,8 @@ dao.getTags = function (callback) {
 dao.addTag = function (name, callback) {
     pool.getConnection(function (err, conn) {
         if (err) console.log(err);
-        var sql = "insert into tags (id,name) values (?)";
-        conn.query(sql, [[100,"huaichao222"]], function (err, rows) {
+        var sql = "insert into tags (name) values (?)";
+        conn.query(sql, [name], function (err, rows) {
             conn.release();
             console.log(err);
             if (err) console.log('add tag failed');

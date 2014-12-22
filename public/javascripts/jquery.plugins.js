@@ -51,7 +51,7 @@
         _create: function () {
             var _this = this;
             this.element.addClass('mipt');
-            this.input = $('<input>').appendTo(this.element);
+            this.input = $('<input type="text">').appendTo(this.element);
             this.element.click(function (e) {
                 if (e.target == this) _this.input.focus();
                 var el = $(e.target);

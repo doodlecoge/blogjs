@@ -1,0 +1,154 @@
+extends layout
+
+block head
+  link(rel='stylesheet', href='/css/font-awesome.min.css')
+  link(rel='stylesheet', href='/stylesheets/editor2.css')
+  link(rel='stylesheet', href='/css/preview.css')
+  link(rel='stylesheet', href='/stylesheets/jquery.plugins.css')
+  script(type='text/javascript', src='/javascripts/jquery-1.11.1.js')
+  script(type='text/javascript', src='/javascripts/jquery.plugins.js')
+  script(type='text/javascript', src='/javascripts/marked.js')
+  script(type='text/javascript', src='/javascripts/ace/ace.js')
+  style(type="text/css").
+    body, input[type="text"] {
+      font-family: Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro, monospace;
+    }
+block content
+
+  span#W(style="visibility:hidden;")
+  table.tbl
+    tr
+      td.t(style="width:1%; background: #ccc;")
+        span(style="line-height:30px") Title:
+      td
+        input#title(type="text", placeholder="Title of this post.")
+    tr
+      td(style="height: 5px")
+    tr
+      td.t(style="width:1%; background: #ccc;")
+        span(style="line-height:30px") Tags:
+      td#tags
+    tr
+      td(style="height: 5px")
+    tr
+      td.t(style="width:1%; background: #ccc;")
+        span(style="line-height:30px") Image of post:
+      td
+        img.alogo(src="/upload/images/alogo/no-img.png",title="click to change")
+  br
+  #editor
+  #viewer
+
+  - if(article)
+    textarea#original_content(style="visibility: hidden;").
+      !{article['content']}
+
+
+
+  script(type="text/javascript").
+    var id = 0;
+    marked.setOptions({
+      renderer: new marked.Renderer(),
+      gfm: true,
+      tables: true,
+      breaks: false,
+      pedantic: false,
+      sanitize: true,
+      smartLists: true,
+      smartypants: false
+    });
+
+    var editor = ace.edit($("#editor").get(0));
+    editor.setTheme("ace/theme/eclipse");
+    editor.setPrintMarginColumn(80);
+    editor.session.setMode("ace/mode/markdown");
+    var doc = editor.getSession().doc;
+    doc.on('change', function (e) {
+      var txt = editor.getValue();
+      var html = marked(txt);
+      $("#viewer").html(html);
+    });
+    //editor.session.on('changeScrollTop', syncPreview);
+    //function syncPreview() {
+    //  var v = $("#viewer");
+    //  var n = editor.getSession().getLength();
+    //  var i = editor.getFirstVisibleRow();
+    //  var r = getScrollHeight(v);
+    //  v.scrollTop(i * r / n);
+    //}
+    //function getScrollHeight(e) {
+    //  return e[0].scrollHeight !== undefined ? e[0].scrollHeight : e.find("html")[0].scrollHeight !== undefined && e.find("html")[0].scrollHeight !== 0 ? e.find("html")[0].scrollHeight : e.find("body")[0].scrollHeight
+    //}
+
+    $('#tags').mipt({
+      autocomplete: {
+        data: !{tags},
+        onSelected: function (data) {
+
+        }
+      }
+    });
+
+
+      // save article
+    $('#save_btn').click(function () {
+      var title = $('#title').val();
+      var tags = $('#tags').mipt('data');
+      var content = editor.getValue();
+
+      tags = $.map(tags, function (tag) {
+        return tag.id;
+      });
+
+      var xhr = $.ajax({
+        url: '/article/' + id + '/save',
+        type: 'POST',
+        data: {
+          title: title,
+          tags: tags.join(','),
+          content: content
+        },
+        dataType: 'json'
+      });
+      xhr.done(function (data) {
+        location.href = '/article/' + data.id;
+      });
+      xhr.fail(function (data) {
+
+      });
+    });
+
+  - if (article)
+    script.
+      id = !{article['id']};
+      editor.setValue($('#original_content').val());
+      $('#title').val('!{article['title']}');
+
+  - if(article)
+    script
+      - article.tags.forEach(function(tag) {
+        | $('#tags').mipt('addItem', {
+        | id:!{tag.id},
+        | label:'!{tag.name}'
+        | });
+      - });
+
+
+
+//      $('#tags').click(function () {
+//        $(this).find('input').focus();
+//      });
+//      $('.ipt').autocomplete({
+//        data: ['java', 'spring', 'c/c++', 'hibernate']
+//      });
+//      $('#tags input').on('keyup', function (e) {
+//        $("#W").html($(this).val());
+//        $(this).width($('#W').width() + 16);
+//      });
+
+
+
+
+
+
+
