@@ -44,8 +44,8 @@ block content
       td
         #editor
         #viewer
-  p#images.
-    The quick brown fox jumps over the lazy dog.
+  #images loading article logos ...
+
 
   - if(article)
     textarea#original_content(style="visibility: hidden;").
@@ -54,6 +54,9 @@ block content
 
 
   script(type="text/javascript").
+    $(".alogo").click(function() {
+      $("#images").dialog('show');
+    });
     $("#images").dialog({
       title: 'Hello World',
       buttons: {
@@ -87,17 +90,6 @@ block content
       var html = marked(txt);
       $("#viewer").html(html);
     });
-    //editor.session.on('changeScrollTop', syncPreview);
-    //function syncPreview() {
-    //  var v = $("#viewer");
-    //  var n = editor.getSession().getLength();
-    //  var i = editor.getFirstVisibleRow();
-    //  var r = getScrollHeight(v);
-    //  v.scrollTop(i * r / n);
-    //}
-    //function getScrollHeight(e) {
-    //  return e[0].scrollHeight !== undefined ? e[0].scrollHeight : e.find("html")[0].scrollHeight !== undefined && e.find("html")[0].scrollHeight !== 0 ? e.find("html")[0].scrollHeight : e.find("body")[0].scrollHeight
-    //}
 
     $('#tags').mipt({
       autocomplete: {
@@ -151,21 +143,6 @@ block content
         | label:'!{tag.name}'
         | });
       - });
-
-
-
-//      $('#tags').click(function () {
-//        $(this).find('input').focus();
-//      });
-//      $('.ipt').autocomplete({
-//        data: ['java', 'spring', 'c/c++', 'hibernate']
-//      });
-//      $('#tags input').on('keyup', function (e) {
-//        $("#W").html($(this).val());
-//        $(this).width($('#W').width() + 16);
-//      });
-
-
 
 
 
