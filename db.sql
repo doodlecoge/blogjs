@@ -29,8 +29,7 @@ VALUES
 CREATE TABLE tags
 (
   id   INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(20) NOT NULL UNIQUE,
-  img  VARCHAR(24) NULL -- <name> "." <ext>
+  name VARCHAR(20) NOT NULL UNIQUE
 );
 
 INSERT INTO tags (id, name)
@@ -45,6 +44,13 @@ VALUES
   (8, 'c#'),
   (9, 'python');
 
+CREATE TABLE logos
+(
+  id   INT AUTO_INCREMENT PRIMARY KEY,
+  description VARCHAR(64) NOT NULL,
+  path  VARCHAR(82) NULL
+);
+
 CREATE TABLE articles
 (
   id         INT AUTO_INCREMENT PRIMARY KEY,
@@ -53,7 +59,9 @@ CREATE TABLE articles
   username   VARCHAR(20)   NOT NULL,
   created_at DATETIME      NOT NULL,
   updated_at DATETIME      NOT NULL,
-  FOREIGN KEY (username) REFERENCES users (username)
+  logo_id int null,
+  FOREIGN KEY (username) REFERENCES users (username),
+  foreign key (logo_id) references logos(id)
 );
 
 INSERT INTO articles

@@ -17,8 +17,8 @@ app.set('view engine', 'jade');
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(session({
     secret: 'huaichao',
@@ -38,9 +38,11 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var article = require('./routes/article');
 var tag = require('./routes/tag');
+var logo = require('./routes/logo');
 var test = require('./routes/test');
 
 app.use(function (req, res, next) {
+    return next();
     if (req.session['user']) return next();
 
     delete req.session.error;
@@ -72,6 +74,7 @@ app.use('/', routes);
 app.use('/article', article);
 app.use('/users', users);
 app.use('/tag', tag);
+app.use('/logo', logo);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

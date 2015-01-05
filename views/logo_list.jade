@@ -1,0 +1,38 @@
+// Created by huaichao on 2014/12/27.
+
+extends layout
+block content
+  form(action="/logo/upload",method="post",enctype="multipart/form-data")
+    input(type="file", name="logo", id="logo_file")
+    button(type="button",id="open") Choose File
+    span
+    hr
+    span Name:
+    input(type="text", name="name")
+    hr
+    input(type="submit")
+  - var len = logos.length
+  - var rows = Math.floor((len + 4) / 5)
+  - var i = 0, t
+  table.logos
+    while rows-- > 0
+      tr
+        - t = 0
+        while t++ < 5
+          td
+            if i < len
+              - var logo = logos[i++]
+              img(src='/upload/images/alogo/#{logo.path}')
+      tr
+        - t = 0
+        - i = i - 5
+        while t++ < 5
+          td
+            if i < len
+              - var logo = logos[i++]
+              span= logo.description
+
+  script(type="text/javascript").
+    $('#open').click(function(){
+      $('#logo_file').focus().click();
+    });
